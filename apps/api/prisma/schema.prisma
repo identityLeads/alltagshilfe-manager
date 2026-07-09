@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CustomerStatus {
+  AKTIV
+  NEU
+  PAUSIERT
+}
+
+enum BillingMethod {
+  DTA_302
+  PAPIER_POST
+}
+
+enum ServiceCategory {
+  HAUSHALTSNAHE_DL
+  BETREUUNG_IM_ALLTAG
+  SONSTIGES
+}
+
+enum BillingType {
+  KASSE_45B
+  SELBSTZAHLER
+}
+
+enum DocumentType {
+  RECHNUNG
+  ANGEBOT
+}
+
+enum InvoiceStatus {
+  ENTWURF
+  VERSENDET
+  OFFEN
+  BEZAHLT
+  UEBERFAELLIG
+}
+
+enum TaskPriority {
+  HOCH
+  MITTEL
+  NIEDRIG
+}
+
+enum RequestStatus {
+  NEU
+  ANGENOMMEN
+  ABGELEHNT
+}
+
+model Insurer {
+  id             String        @id @default(cuid())
+  name           String
+  type           String        @default("Gesetzliche Pflegekasse")
+  ik             String        @unique
+  contactPerson  String
+  phone          String
+  billingMethod  BillingMethod @default(DTA_302)
+  customers      Customer[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Customer {
+  id              String         @id @default(cuid())
+  firstName       String
+  lastName        String
+  street          String
+  postalCode      String
+  city            String
+  district        String?
+  phone           String
+  birthDate       DateTime?
+  careLevel       Int
+  status          CustomerStatus @default(NEU)
+  customerSince   DateTime       @default(now())
+  insurerId       String?
+  insurer         Insurer?       @relation(fields: [insurerId], references: [id])
+  contacts        Contact[]
+  documents       Document[]
+  serviceRecords  ServiceRecord[]
+  invoices        Invoice[]
+  tourAssignments TourAssignment[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model Contact {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  name       String
+  role       String
+  phone      String
+  createdAt  DateTime @default(now())
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  name       String
+  mimeType   String
+  sizeBytes  Int
+  filePath   String
+  uploadedAt DateTime @default(now())
+}
+
+model Service {
+  id             String          @id @default(cuid())
+  name           String
+  category       ServiceCategory
+  billingType    BillingType
+  priceCents     Int
+  unit           String          @default("pro Stunde")
+  icon           String          @default("ph ph-hand-heart")
+  serviceRecords ServiceRecord[]
+  lineItems      InvoiceLineItem[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Staff {
+  id                  String            @id @default(cuid())
+  firstName           String
+  lastName            String
+  area                String
+  phone               String
+  qualifications       String[]
+  availabilityLabel    String
+  weeklyCapacityHours  Int               @default(30)
+  serviceRecords       ServiceRecord[]
+  tourAssignments      TourAssignment[]
+  createdAt            DateTime          @default(now())
+  updatedAt             DateTime         @updatedAt
+}
+
+model ServiceRecord {
+  id                   String   @id @default(cuid())
+  customerId           String
+  customer             Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  serviceId            String?
+  service               Service? @relation(fields: [serviceId], references: [id])
+  staffId              String?
+  staff                Staff?   @relation(fields: [staffId], references: [id])
+  date                 DateTime
+  amountCents          Int
+  billedToReliefBudget Boolean  @default(true)
+  createdAt            DateTime @default(now())
+}
+
+model Invoice {
+  id                     String        @id @default(cuid())
+  number                 String        @unique
+  documentType           DocumentType  @default(RECHNUNG)
+  status                 InvoiceStatus @default(ENTWURF)
+  customerId             String
+  customer               Customer      @relation(fields: [customerId], references: [id])
+  issueDate              DateTime      @default(now())
+  period                 String
+  assignedToReliefBudget Boolean       @default(false)
+  lineItems              InvoiceLineItem[]
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+}
+
+model InvoiceLineItem {
+  id             String   @id @default(cuid())
+  invoiceId      String
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  serviceId      String?
+  service        Service? @relation(fields: [serviceId], references: [id])
+  description    String
+  quantity       Decimal  @db.Decimal(10, 2)
+  unit           String   @default("Std")
+  unitPriceCents Int
+  sortOrder      Int      @default(0)
+}
+
+model TourAssignment {
+  id              String   @id @default(cuid())
+  staffId         String
+  staff           Staff    @relation(fields: [staffId], references: [id])
+  customerId      String
+  customer        Customer @relation(fields: [customerId], references: [id])
+  serviceLabel    String
+  date            DateTime
+  startMinutes    Int
+  durationMinutes Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Task {
+  id        String       @id @default(cuid())
+  text      String
+  meta      String?
+  priority  TaskPriority @default(MITTEL)
+  done      Boolean      @default(false)
+  dueDate   DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model Request {
+  id        String        @id @default(cuid())
+  name      String
+  info      String
+  status    RequestStatus @default(NEU)
+  createdAt DateTime      @default(now())
+}

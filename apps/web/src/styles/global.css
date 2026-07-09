@@ -1,0 +1,109 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Public Sans", system-ui, sans-serif;
+  color: #17211c;
+  background: #eef1ef;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: #2e7d63;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #24614d;
+}
+
+button {
+  font-family: inherit;
+}
+
+.mono {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d5dbd8;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c1c9c5;
+  background-clip: content-box;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9aa5a0;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+.navhov:hover {
+  background: var(--nav-hover) !important;
+}
+
+.rowhov {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.rowhov:hover {
+  background: #f7f9f8 !important;
+}
+
+.lift {
+  transition:
+    box-shadow 0.14s,
+    border-color 0.14s;
+}
+
+.lift:hover {
+  box-shadow: 0 4px 16px rgba(23, 33, 28, 0.07);
+  border-color: #d3dad6;
+}
+
+.pbtn {
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+
+.pbtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
