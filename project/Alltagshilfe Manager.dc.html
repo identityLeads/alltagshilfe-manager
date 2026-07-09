@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Public Sans',system-ui,sans-serif;color:#17211C;background:#EEF1EF;-webkit-font-smoothing:antialiased}
+  a{color:#2E7D63;text-decoration:none}
+  a:hover{color:#24614D}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-thumb{background:#D5DBD8;border-radius:8px;border:3px solid transparent;background-clip:content-box}
+  ::-webkit-scrollbar-thumb:hover{background:#C1C9C5;background-clip:content-box}
+  input::placeholder{color:#9AA5A0}
+  .navhov:hover{background:var(--nav-hover)!important}
+  .rowhov{cursor:pointer;transition:background .1s}
+  .rowhov:hover{background:#F7F9F8!important}
+  .lift{transition:box-shadow .14s,border-color .14s}
+  .lift:hover{box-shadow:0 4px 16px rgba(23,33,28,.07);border-color:#D3DAD6}
+  .pbtn{cursor:pointer;transition:background .12s,border-color .12s,color .12s}
+</style>
+</helmet>
+<div style="--accent:{{ accent }};--accent-soft:{{ accentSoft }};--accent-line:{{ accentLine }};display:flex;height:100vh;overflow:hidden;font-size:14px">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside style="width:250px;flex:none;display:flex;flex-direction:column;background:{{ sb.bg }};border-right:1px solid {{ sb.border }}">
+    <div style="display:flex;align-items:center;gap:11px;padding:20px 18px 18px 18px">
+      <div style="width:34px;height:34px;flex:none;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(46,125,99,.35)">
+        <i class="ph-fill ph-hand-heart" style="color:#fff;font-size:20px"></i>
+      </div>
+      <div style="line-height:1.15">
+        <div style="font-weight:700;font-size:15px;color:{{ sb.brand }}">Alltagshilfe</div>
+        <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:{{ sb.muted }};font-weight:600">Manager</div>
+      </div>
+    </div>
+
+    <nav style="flex:1;overflow-y:auto;padding:8px 12px 8px 0">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="7">
+        <a class="navhov" style="{{ item.style }}" onClick="{{ item.onClick }}">
+          <i class="{{ item.icon }}" style="font-size:19px;width:20px;text-align:center;flex:none"></i>
+          <span>{{ item.label }}</span>
+          <sc-if value="{{ item.badge }}" hint-placeholder-val="{{ false }}">
+            <span style="margin-left:auto;background:var(--accent);color:#fff;font-size:11px;font-weight:700;min-width:19px;height:19px;padding:0 5px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center">{{ item.badge }}</span>
+          </sc-if>
+        </a>
+      </sc-for>
+    </nav>
+
+    <div style="padding:12px;border-top:1px solid {{ sb.border }}">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px">
+        <div style="width:32px;height:32px;flex:none;border-radius:999px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">MB</div>
+        <div style="line-height:1.2;min-width:0">
+          <div style="font-weight:600;font-size:13px;color:{{ sb.brand }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Martina Böhm</div>
+          <div style="font-size:11.5px;color:{{ sb.muted }}">Büroleitung</div>
+        </div>
+        <i class="ph ph-gear-six" style="margin-left:auto;color:{{ sb.muted }};font-size:17px;cursor:pointer"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F4F6F5">
+
+    <!-- Topbar -->
+    <header style="flex:none;height:66px;display:flex;align-items:center;gap:18px;padding:0 28px;background:#FBFCFB;border-bottom:1px solid #E4E8E6">
+      <div style="min-width:0">
+        <h1 style="margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em">{{ pageTitle }}</h1>
+        <div style="font-size:12.5px;color:#7C8983;margin-top:1px">{{ pageSub }}</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <div style="position:relative;display:flex;align-items:center">
+          <i class="ph ph-magnifying-glass" style="position:absolute;left:11px;color:#9AA5A0;font-size:16px;pointer-events:none"></i>
+          <input placeholder="Kunde, Rechnung, Mitarbeiter…" style="width:250px;height:38px;padding:0 12px 0 34px;border:1px solid #E4E8E6;border-radius:9px;background:#fff;font-size:13px;font-family:inherit;color:#17211C;outline:none"/>
+        </div>
+        <button class="pbtn" style="position:relative;width:38px;height:38px;flex:none;border:1px solid #E4E8E6;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center">
+          <i class="ph ph-bell" style="font-size:18px;color:#4A574F"></i>
+          <span style="position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:999px;background:#B24A3F;border:1.5px solid #fff"></span>
+        </button>
+        <button class="pbtn" style="height:38px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:0 15px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;font-family:inherit;box-shadow:0 2px 6px rgba(46,125,99,.3)">
+          <i class="ph ph-plus" style="font-size:16px"></i> Neu
+        </button>
+      </div>
+    </header>
+
+    <!-- Scroll area -->
+    <main style="flex:1;overflow-y:auto;padding:26px 28px 40px 28px">
+
+      <!-- ================= DASHBOARD ================= -->
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:1180px;margin:0 auto">
+        <!-- KPI tiles -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div class="lift" style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;{{ k.iconStyle }}">
+                  <i class="{{ k.icon }}" style="font-size:19px"></i>
+                </div>
+                <span style="{{ k.trendStyle }}"><i class="{{ k.trendIcon }}" style="font-size:13px"></i>{{ k.trend }}</span>
+              </div>
+              <div style="font-size:29px;font-weight:700;letter-spacing:-.02em;margin-top:13px;line-height:1">{{ k.value }}</div>
+              <div style="font-size:13px;font-weight:600;color:#3B473F;margin-top:6px">{{ k.label }}</div>
+              <div style="font-size:12px;color:#8A958F;margin-top:2px">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:16px;margin-top:16px;align-items:start">
+          <!-- Left column -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- Wochenübersicht -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px 20px 20px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                <div>
+                  <div style="font-size:14.5px;font-weight:600">Wochenübersicht</div>
+                  <div style="font-size:12px;color:#8A958F;margin-top:1px">Einsätze pro Tag · KW 28</div>
+                </div>
+                <div style="display:flex;gap:14px;font-size:11.5px;color:#7C8983">
+                  <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:var(--accent)"></span>geplant</span>
+                  <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#E1E7E4"></span>frei</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:14px;height:150px">
+                <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;height:100%;justify-content:flex-end">
+                    <div style="font-size:12px;font-weight:600;color:#3B473F">{{ d.n }}</div>
+                    <div style="width:100%;max-width:38px;background:#EEF2F0;border-radius:6px;height:100%;display:flex;align-items:flex-end;overflow:hidden">
+                      <div style="width:100%;height:{{ d.h }};background:{{ d.bar }};border-radius:6px 6px 0 0"></div>
+                    </div>
+                    <div style="font-size:12px;color:#8A958F;font-weight:500">{{ d.day }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- Touren heute -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px 20px 8px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <div style="font-size:14.5px;font-weight:600">Anstehende Touren heute</div>
+                <a onClick="{{ goTouren }}" style="font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:3px">Alle Touren <i class="ph ph-arrow-right" style="font-size:13px"></i></a>
+              </div>
+              <sc-for list="{{ upcoming }}" as="t" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:13px;padding:11px 0;border-top:1px solid #EEF1EF">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:#3B473F;width:46px;flex:none">{{ t.time }}</div>
+                  <div style="width:30px;height:30px;flex:none;border-radius:999px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">{{ t.ini }}</div>
+                  <div style="min-width:0;flex:1">
+                    <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.kunde }}</div>
+                    <div style="font-size:12px;color:#8A958F">{{ t.leistung }} · {{ t.mitarbeiter }}</div>
+                  </div>
+                  <span style="{{ t.badge }}">{{ t.dur }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- Right column -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- Aufgaben -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px 20px 12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div style="font-size:14.5px;font-weight:600">Aufgaben</div>
+                <span style="font-size:11.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:999px">{{ openTaskCount }} offen</span>
+              </div>
+              <sc-for list="{{ tasks }}" as="t" hint-placeholder-count="4">
+                <div class="pbtn" style="display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-top:1px solid #EEF1EF" onClick="{{ t.toggle }}">
+                  <i class="{{ t.check }}" style="font-size:19px;flex:none;margin-top:1px;{{ t.checkStyle }}"></i>
+                  <div style="min-width:0;flex:1">
+                    <div style="font-size:13.5px;font-weight:500;line-height:1.35;{{ t.textStyle }}">{{ t.text }}</div>
+                    <div style="font-size:12px;color:#9AA5A0;margin-top:2px">{{ t.meta }}</div>
+                  </div>
+                  <span style="width:8px;height:8px;flex:none;margin-top:6px;border-radius:999px;background:{{ t.prio }}"></span>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- Neue Anfragen -->
+            <div style="background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:13px;padding:18px 20px">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+                <i class="ph-fill ph-tray-arrow-down" style="font-size:20px;color:var(--accent)"></i>
+                <div style="font-size:14.5px;font-weight:600;color:#1E3A2E">3 neue Anfragen</div>
+              </div>
+              <sc-for list="{{ anfragen }}" as="a" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid rgba(46,125,99,.14)">
+                  <div style="min-width:0;flex:1">
+                    <div style="font-size:13px;font-weight:600;color:#1E3A2E">{{ a.name }}</div>
+                    <div style="font-size:12px;color:#4F6A5C">{{ a.info }}</div>
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <button class="pbtn" style="width:30px;height:30px;border-radius:8px;border:none;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center"><i class="ph ph-check" style="font-size:15px"></i></button>
+                    <button class="pbtn" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--accent-line);background:#fff;color:#4F6A5C;display:flex;align-items:center;justify-content:center"><i class="ph ph-x" style="font-size:15px"></i></button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= KUNDEN LISTE ================= -->
+      <sc-if value="{{ isKundenListe }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1180px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="display:flex;gap:7px">
+            <span style="background:var(--accent);color:#fff;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:600">Alle · 8</span>
+            <span class="pbtn" style="background:#fff;color:#4A574F;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #E4E8E6">Aktiv · 6</span>
+            <span class="pbtn" style="background:#fff;color:#4A574F;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #E4E8E6">Neu · 1</span>
+            <span class="pbtn" style="background:#fff;color:#4A574F;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #E4E8E6">Pausiert · 1</span>
+          </div>
+          <button class="pbtn" style="margin-left:auto;height:38px;background:#fff;color:#2A352F;border:1px solid #E4E8E6;border-radius:9px;padding:0 14px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:7px;font-family:inherit"><i class="ph ph-funnel" style="font-size:15px"></i> Filter</button>
+          <button class="pbtn" style="height:38px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:0 15px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;font-family:inherit"><i class="ph ph-user-plus" style="font-size:16px"></i> Kunde anlegen</button>
+        </div>
+
+        <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;overflow:hidden">
+          <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+            <thead>
+              <tr style="background:#FAFBFA;color:#7C8983;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em">
+                <th style="padding:12px 16px;font-weight:600">Kunde</th>
+                <th style="padding:12px 16px;font-weight:600">Pflegegrad</th>
+                <th style="padding:12px 16px;font-weight:600">Pflegekasse</th>
+                <th style="padding:12px 16px;font-weight:600;width:210px">Entlastungsbudget</th>
+                <th style="padding:12px 16px;font-weight:600">Status</th>
+                <th style="padding:12px 16px;font-weight:600;width:40px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ kunden }}" as="k" hint-placeholder-count="8">
+                <tr class="rowhov" style="border-top:1px solid #EEF1EF" onClick="{{ k.open }}">
+                  <td style="padding:12px 16px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:34px;height:34px;flex:none;border-radius:999px;background:{{ k.avBg }};color:{{ k.avColor }};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700">{{ k.ini }}</div>
+                      <div>
+                        <div style="font-weight:600;color:#17211C">{{ k.name }}</div>
+                        <div style="font-size:12px;color:#8A958F">{{ k.ort }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="padding:12px 16px"><span style="background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px">{{ k.pg }}</span></td>
+                  <td style="padding:12px 16px;color:#4A574F">{{ k.kasse }}</td>
+                  <td style="padding:12px 16px">
+                    <div style="display:flex;align-items:center;gap:9px">
+                      <div style="flex:1;height:7px;background:#EEF2F0;border-radius:999px;overflow:hidden"><div style="width:{{ k.budgetPct }};height:100%;background:{{ k.budgetColor }};border-radius:999px"></div></div>
+                      <span style="font-size:11.5px;color:#7C8983;white-space:nowrap;font-family:'IBM Plex Mono',monospace">{{ k.budgetLabel }}</span>
+                    </div>
+                  </td>
+                  <td style="padding:12px 16px"><span style="{{ k.statusBadge }}">{{ k.statusLabel }}</span></td>
+                  <td style="padding:12px 16px;text-align:center"><i class="ph ph-caret-right" style="color:#B5BEB9;font-size:15px"></i></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= KUNDE DETAIL ================= -->
+      <sc-if value="{{ isKundeDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1180px;margin:0 auto">
+        <a onClick="{{ backToList }}" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#7C8983;cursor:pointer;margin-bottom:14px"><i class="ph ph-arrow-left" style="font-size:15px"></i> Zurück zur Kundenliste</a>
+
+        <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:20px 22px;display:flex;align-items:center;gap:18px">
+          <div style="width:56px;height:56px;flex:none;border-radius:999px;background:{{ cust.avBg }};color:{{ cust.avColor }};display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700">{{ cust.ini }}</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <h2 style="margin:0;font-size:21px;font-weight:700;letter-spacing:-.01em">{{ cust.name }}</h2>
+              <span style="{{ cust.statusBadge }}">{{ cust.statusLabel }}</span>
+            </div>
+            <div style="font-size:13px;color:#7C8983;margin-top:3px;display:flex;gap:16px">
+              <span><i class="ph ph-map-pin" style="font-size:14px;vertical-align:-1px;margin-right:3px"></i>{{ cust.ort }}</span>
+              <span><i class="ph ph-phone" style="font-size:14px;vertical-align:-1px;margin-right:3px"></i>{{ cust.tel }}</span>
+              <span>Kunde seit {{ cust.seit }}</span>
+            </div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="pbtn" style="height:38px;background:#fff;color:#2A352F;border:1px solid #E4E8E6;border-radius:9px;padding:0 14px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:7px;font-family:inherit"><i class="ph ph-pencil-simple" style="font-size:15px"></i> Bearbeiten</button>
+            <button class="pbtn" style="height:38px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:0 15px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;font-family:inherit"><i class="ph ph-receipt" style="font-size:15px"></i> Rechnung erstellen</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:16px;margin-top:16px;align-items:start">
+          <!-- left -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- Budget -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px 20px">
+              <div style="font-size:13px;font-weight:600;color:#3B473F;margin-bottom:3px">Entlastungsbudget · § 45b</div>
+              <div style="font-size:12px;color:#8A958F;margin-bottom:14px">Juli 2026</div>
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <span style="font-size:30px;font-weight:700;letter-spacing:-.02em;font-family:'IBM Plex Mono',monospace;color:{{ cust.budgetColor }}">{{ cust.budgetUsed }}</span>
+                <span style="font-size:14px;color:#8A958F">/ 125,00 € genutzt</span>
+              </div>
+              <div style="height:10px;background:#EEF2F0;border-radius:999px;overflow:hidden;margin:13px 0 8px"><div style="width:{{ cust.budgetPct }};height:100%;background:{{ cust.budgetColor }};border-radius:999px"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#8A958F">Verbleibend</span><span style="font-weight:600;font-family:'IBM Plex Mono',monospace">{{ cust.budgetRest }}</span></div>
+              <div style="margin-top:12px;padding:9px 11px;background:#FBF2DC;border-radius:8px;font-size:12px;color:#8A6D1E;display:flex;gap:8px;align-items:center">
+                <i class="ph ph-info" style="font-size:15px"></i> Nicht genutztes Budget verfällt zum Jahresende.
+              </div>
+            </div>
+            <!-- Stammdaten -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px 20px">
+              <div style="font-size:14px;font-weight:600;margin-bottom:13px">Stammdaten</div>
+              <sc-for list="{{ cust.stamm }}" as="s" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid #EEF1EF;font-size:13px">
+                  <span style="color:#8A958F">{{ s.k }}</span><span style="font-weight:500;text-align:right">{{ s.v }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <!-- Pflegekasse -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px 20px">
+              <div style="font-size:14px;font-weight:600;margin-bottom:12px">Zugeordnete Pflegekasse</div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:38px;height:38px;flex:none;border-radius:9px;background:#EEF1F5;color:#2C6B8C;display:flex;align-items:center;justify-content:center"><i class="ph ph-buildings" style="font-size:19px"></i></div>
+                <div><div style="font-weight:600;font-size:13.5px">{{ cust.kasse }}</div><div style="font-size:12px;color:#8A958F;font-family:'IBM Plex Mono',monospace">IK {{ cust.ik }}</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- right -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- Kontakte -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px 20px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div style="font-size:14px;font-weight:600">Angehörige & Kontakte</div>
+                <a style="font-size:12.5px;font-weight:600;cursor:pointer">+ Hinzufügen</a>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:6px">
+                <sc-for list="{{ cust.kontakte }}" as="c" hint-placeholder-count="2">
+                  <div style="border:1px solid #EEF1EF;border-radius:10px;padding:12px 13px">
+                    <div style="font-weight:600;font-size:13.5px">{{ c.name }}</div>
+                    <div style="font-size:12px;color:#8A958F;margin-bottom:6px">{{ c.rolle }}</div>
+                    <div style="font-size:12.5px;color:#4A574F;font-family:'IBM Plex Mono',monospace">{{ c.tel }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <!-- Leistungshistorie -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;overflow:hidden">
+              <div style="padding:16px 20px 4px;font-size:14px;font-weight:600">Leistungshistorie</div>
+              <table style="width:100%;border-collapse:collapse;font-size:13px">
+                <thead><tr style="color:#8A958F;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em">
+                  <th style="padding:9px 20px;font-weight:600">Datum</th><th style="padding:9px 16px;font-weight:600">Leistung</th><th style="padding:9px 16px;font-weight:600">Mitarbeiter</th><th style="padding:9px 20px;font-weight:600;text-align:right">Betrag</th>
+                </tr></thead>
+                <tbody>
+                  <sc-for list="{{ cust.historie }}" as="h" hint-placeholder-count="5">
+                    <tr style="border-top:1px solid #EEF1EF">
+                      <td style="padding:10px 20px;color:#7C8983;font-family:'IBM Plex Mono',monospace">{{ h.datum }}</td>
+                      <td style="padding:10px 16px;font-weight:500">{{ h.leistung }}</td>
+                      <td style="padding:10px 16px;color:#4A574F">{{ h.ma }}</td>
+                      <td style="padding:10px 20px;text-align:right;font-family:'IBM Plex Mono',monospace">{{ h.betrag }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <!-- Dokumente -->
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px 20px 14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div style="font-size:14px;font-weight:600">Dokumente</div>
+                <a style="font-size:12.5px;font-weight:600;cursor:pointer">+ Hochladen</a>
+              </div>
+              <sc-for list="{{ cust.docs }}" as="d" hint-placeholder-count="3">
+                <div class="pbtn" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #EEF1EF">
+                  <div style="width:32px;height:32px;flex:none;border-radius:8px;background:{{ d.iconBg }};color:{{ d.iconColor }};display:flex;align-items:center;justify-content:center"><i class="{{ d.icon }}" style="font-size:17px"></i></div>
+                  <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">{{ d.name }}</div><div style="font-size:11.5px;color:#9AA5A0">{{ d.meta }}</div></div>
+                  <i class="ph ph-download-simple" style="color:#B5BEB9;font-size:17px"></i>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= KASSEN ================= -->
+      <sc-if value="{{ isKassen }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1180px;margin:0 auto">
+        <div style="display:flex;align-items:center;margin-bottom:16px">
+          <div style="font-size:13px;color:#7C8983">6 Kranken- & Pflegekassen · verwaltet nach Institutionskennzeichen (IK)</div>
+          <button class="pbtn" style="margin-left:auto;height:38px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:0 15px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;font-family:inherit"><i class="ph ph-plus" style="font-size:16px"></i> Kostenträger anlegen</button>
+        </div>
+        <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;overflow:hidden">
+          <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+            <thead><tr style="background:#FAFBFA;color:#7C8983;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em">
+              <th style="padding:12px 16px;font-weight:600">Kostenträger</th><th style="padding:12px 16px;font-weight:600">IK-Nummer</th><th style="padding:12px 16px;font-weight:600">Ansprechpartner</th><th style="padding:12px 16px;font-weight:600">Abrechnungsweg</th><th style="padding:12px 16px;font-weight:600;text-align:center">Kunden</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ kassen }}" as="k" hint-placeholder-count="6">
+                <tr class="rowhov" style="border-top:1px solid #EEF1EF">
+                  <td style="padding:12px 16px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:34px;height:34px;flex:none;border-radius:8px;background:#EEF1F5;color:#2C6B8C;display:flex;align-items:center;justify-content:center"><i class="ph ph-buildings" style="font-size:18px"></i></div>
+                      <div><div style="font-weight:600">{{ k.name }}</div><div style="font-size:12px;color:#8A958F">{{ k.typ }}</div></div>
+                    </div>
+                  </td>
+                  <td style="padding:12px 16px;font-family:'IBM Plex Mono',monospace;color:#4A574F">{{ k.ik }}</td>
+                  <td style="padding:12px 16px"><div style="font-weight:500">{{ k.ap }}</div><div style="font-size:12px;color:#8A958F;font-family:'IBM Plex Mono',monospace">{{ k.tel }}</div></td>
+                  <td style="padding:12px 16px"><span style="{{ k.wegBadge }}">{{ k.weg }}</span></td>
+                  <td style="padding:12px 16px;text-align:center;font-weight:600;font-family:'IBM Plex Mono',monospace">{{ k.kunden }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= LEISTUNGSKATALOG ================= -->
+      <sc-if value="{{ isKatalog }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1180px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="display:flex;gap:7px">
+            <span style="background:var(--accent);color:#fff;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:600">Alle</span>
+            <span class="pbtn" style="background:#fff;color:#4A574F;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #E4E8E6">Haushaltsnahe DL</span>
+            <span class="pbtn" style="background:#fff;color:#4A574F;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #E4E8E6">Betreuung im Alltag</span>
+            <span class="pbtn" style="background:#fff;color:#4A574F;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #E4E8E6">Sonstiges</span>
+          </div>
+          <button class="pbtn" style="margin-left:auto;height:38px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:0 15px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;font-family:inherit"><i class="ph ph-plus" style="font-size:16px"></i> Leistung anlegen</button>
+        </div>
+        <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;overflow:hidden">
+          <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+            <thead><tr style="background:#FAFBFA;color:#7C8983;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em">
+              <th style="padding:12px 16px;font-weight:600">Bezeichnung</th><th style="padding:12px 16px;font-weight:600">Kategorie</th><th style="padding:12px 16px;font-weight:600">Abrechnung</th><th style="padding:12px 16px;font-weight:600;text-align:right">Preis</th><th style="padding:12px 16px;font-weight:600">Einheit</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ leistungen }}" as="l" hint-placeholder-count="8">
+                <tr class="rowhov" style="border-top:1px solid #EEF1EF">
+                  <td style="padding:12px 16px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:32px;height:32px;flex:none;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center"><i class="{{ l.icon }}" style="font-size:17px"></i></div>
+                      <span style="font-weight:600">{{ l.name }}</span>
+                    </div>
+                  </td>
+                  <td style="padding:12px 16px"><span style="{{ l.katBadge }}">{{ l.kat }}</span></td>
+                  <td style="padding:12px 16px"><span style="{{ l.abrBadge }}">{{ l.abr }}</span></td>
+                  <td style="padding:12px 16px;text-align:right;font-weight:600;font-family:'IBM Plex Mono',monospace">{{ l.preis }}</td>
+                  <td style="padding:12px 16px;color:#8A958F">{{ l.einheit }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= RECHNUNGEN ================= -->
+      <sc-if value="{{ isRechnungen }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+        <!-- list -->
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span style="background:var(--accent);color:#fff;padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:600">Alle</span>
+              <span class="pbtn" style="background:#fff;color:#4A574F;padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:500;border:1px solid #E4E8E6">Entwurf</span>
+              <span class="pbtn" style="background:#fff;color:#4A574F;padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:500;border:1px solid #E4E8E6">Offen</span>
+              <span class="pbtn" style="background:#fff;color:#4A574F;padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:500;border:1px solid #E4E8E6">Bezahlt</span>
+            </div>
+            <button class="pbtn" style="margin-left:auto;height:34px;flex:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0 12px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;font-family:inherit"><i class="ph ph-plus" style="font-size:15px"></i> Neu</button>
+          </div>
+          <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;overflow:hidden">
+            <sc-for list="{{ rechnungen }}" as="r" hint-placeholder-count="6">
+              <div class="rowhov" style="display:flex;align-items:center;gap:13px;padding:13px 16px;border-top:1px solid #EEF1EF;{{ r.activeStyle }}" onClick="{{ r.select }}">
+                <div style="width:34px;height:34px;flex:none;border-radius:8px;background:{{ r.iconBg }};color:{{ r.iconColor }};display:flex;align-items:center;justify-content:center"><i class="{{ r.icon }}" style="font-size:17px"></i></div>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:600;font-family:'IBM Plex Mono',monospace;font-size:12.5px">{{ r.nr }}</span><span style="{{ r.badge }}">{{ r.status }}</span></div>
+                  <div style="font-size:12.5px;color:#8A958F;margin-top:2px">{{ r.kunde }} · {{ r.datum }}</div>
+                </div>
+                <div style="font-weight:700;font-family:'IBM Plex Mono',monospace;font-size:13.5px">{{ r.betrag }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <!-- preview -->
+        <div style="position:sticky;top:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;height:34px">
+            <div style="font-size:13px;color:#7C8983;display:flex;align-items:center;gap:7px"><i class="ph ph-eye" style="font-size:16px"></i> Dokumentvorschau</div>
+            <div style="display:flex;gap:6px">
+              <button class="pbtn" style="height:32px;background:#fff;color:#2A352F;border:1px solid #E4E8E6;border-radius:8px;padding:0 11px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;font-family:inherit"><i class="ph ph-pencil-simple" style="font-size:14px"></i> Bearbeiten</button>
+              <button class="pbtn" style="height:32px;background:#fff;color:#2A352F;border:1px solid #E4E8E6;border-radius:8px;padding:0 11px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;font-family:inherit"><i class="ph ph-paper-plane-tilt" style="font-size:14px"></i> Versenden</button>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;box-shadow:0 6px 24px rgba(23,33,28,.06);padding:34px 36px;font-size:12.5px;line-height:1.5">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center"><i class="ph-fill ph-hand-heart" style="color:#fff;font-size:18px"></i></div>
+                <div style="line-height:1.2"><div style="font-weight:700;font-size:13px">Alltagshilfe München</div><div style="color:#8A958F;font-size:11px">Betreuung & Haushaltsnahe Dienste</div></div>
+              </div>
+              <div style="text-align:right;color:#8A958F;font-size:11px">Rosenheimer Str. 12<br/>81667 München<br/>IK 460101234</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:22px">
+              <div><div style="color:#8A958F;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Rechnung an</div><div style="font-weight:600">Ingrid Bauer</div><div style="color:#4A574F">Lindenstraße 4<br/>81543 München</div></div>
+              <div style="text-align:right;font-family:'IBM Plex Mono',monospace;color:#4A574F"><div><span style="color:#8A958F">Rechnung&nbsp;</span>R-2026-0142</div><div><span style="color:#8A958F">Datum&nbsp;</span>05.07.2026</div><div><span style="color:#8A958F">Zeitraum&nbsp;</span>Juni 2026</div></div>
+            </div>
+            <h3 style="margin:0 0 12px;font-size:18px;font-weight:700">Rechnung</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+              <thead><tr style="color:#8A958F;text-align:left;border-bottom:1.5px solid #E4E8E6"><th style="padding:7px 0;font-weight:600">Leistung</th><th style="padding:7px 0;font-weight:600;text-align:right">Menge</th><th style="padding:7px 0;font-weight:600;text-align:right">Einzel</th><th style="padding:7px 0;font-weight:600;text-align:right">Gesamt</th></tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #EEF1EF"><td style="padding:9px 0">Haushaltshilfe</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">6,00 Std</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">32,00 €</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">192,00 €</td></tr>
+                <tr style="border-bottom:1px solid #EEF1EF"><td style="padding:9px 0">Begleitung bei Terminen</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">2,00 Std</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">34,00 €</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">68,00 €</td></tr>
+                <tr style="border-bottom:1px solid #EEF1EF"><td style="padding:9px 0">Wäscheservice</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">1,00 Std</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">28,00 €</td><td style="padding:9px 0;text-align:right;font-family:'IBM Plex Mono',monospace">28,00 €</td></tr>
+              </tbody>
+            </table>
+            <div style="display:flex;justify-content:flex-end;margin-top:14px">
+              <div style="width:210px">
+                <div style="display:flex;justify-content:space-between;padding:5px 0;color:#4A574F"><span>Zwischensumme</span><span style="font-family:'IBM Plex Mono',monospace">288,00 €</span></div>
+                <div style="display:flex;justify-content:space-between;padding:5px 0;color:#8A958F;font-size:11px"><span>Umsatzsteuerfrei · §4 Nr.16 UStG</span><span style="font-family:'IBM Plex Mono',monospace">0,00 €</span></div>
+                <div style="display:flex;justify-content:space-between;padding:9px 0;margin-top:4px;border-top:1.5px solid #17211C;font-weight:700;font-size:14px"><span>Gesamtbetrag</span><span style="font-family:'IBM Plex Mono',monospace">288,00 €</span></div>
+              </div>
+            </div>
+            <div style="margin-top:20px;padding:11px 13px;background:var(--accent-soft);border-radius:9px;color:#1E3A2E;font-size:11.5px;display:flex;gap:8px"><i class="ph ph-info" style="font-size:15px;flex:none"></i><span>Abtretung an den Entlastungsbetrag nach § 45b SGB XI. Direktabrechnung mit der AOK Bayern.</span></div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= MITARBEITER ================= -->
+      <sc-if value="{{ isMitarbeiter }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1180px;margin:0 auto">
+        <div style="display:flex;align-items:center;margin-bottom:16px">
+          <div style="font-size:13px;color:#7C8983">5 Mitarbeiter · Qualifikationen, Verfügbarkeit und Einsatzgebiete</div>
+          <button class="pbtn" style="margin-left:auto;height:38px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:0 15px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;font-family:inherit"><i class="ph ph-user-plus" style="font-size:16px"></i> Mitarbeiter anlegen</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <sc-for list="{{ mitarbeiter }}" as="m" hint-placeholder-count="6">
+            <div class="lift" style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:18px">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                <div style="width:44px;height:44px;flex:none;border-radius:999px;background:{{ m.avBg }};color:{{ m.avColor }};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700">{{ m.ini }}</div>
+                <div><div style="font-weight:600;font-size:14.5px">{{ m.name }}</div><div style="font-size:12px;color:#8A958F"><i class="ph ph-map-pin" style="font-size:13px;vertical-align:-1px;margin-right:2px"></i>{{ m.gebiet }}</div></div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;min-height:24px">
+                <sc-for list="{{ m.quali }}" as="q" hint-placeholder-count="2">
+                  <span style="background:var(--accent-soft);color:var(--accent);font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:6px">{{ q }}</span>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#8A958F;margin-bottom:5px"><span>Auslastung diese Woche</span><span style="font-weight:600;color:#3B473F;font-family:'IBM Plex Mono',monospace">{{ m.auslastung }}</span></div>
+              <div style="height:7px;background:#EEF2F0;border-radius:999px;overflow:hidden;margin-bottom:14px"><div style="width:{{ m.auslastung }};height:100%;background:{{ m.aColor }};border-radius:999px"></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #EEF1EF;font-size:12.5px">
+                <span style="color:#4A574F"><i class="ph ph-calendar-dots" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>{{ m.tage }}</span>
+                <span style="color:#4A574F;font-family:'IBM Plex Mono',monospace">{{ m.tel }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= TOURENPLANUNG ================= -->
+      <sc-if value="{{ isTouren }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1400px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="display:flex;background:#fff;border:1px solid #E4E8E6;border-radius:9px;padding:3px">
+            <span style="background:var(--accent);color:#fff;padding:6px 14px;border-radius:7px;font-size:13px;font-weight:600">Tag</span>
+            <span class="pbtn" style="color:#4A574F;padding:6px 14px;border-radius:7px;font-size:13px;font-weight:500">Woche</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E4E8E6;border-radius:9px;padding:6px 12px">
+            <i class="ph ph-caret-left pbtn" style="font-size:15px;color:#7C8983"></i>
+            <span style="font-size:13.5px;font-weight:600">Donnerstag, 9. Juli 2026</span>
+            <i class="ph ph-caret-right pbtn" style="font-size:15px;color:#7C8983"></i>
+          </div>
+          <span style="font-size:12.5px;color:#8A958F">13 Einsätze · 4 Mitarbeiter</span>
+          <button class="pbtn" style="margin-left:auto;height:38px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:0 15px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;font-family:inherit"><i class="ph ph-plus" style="font-size:16px"></i> Einsatz planen</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start">
+          <!-- timeline -->
+          <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;overflow:hidden">
+            <!-- hours header -->
+            <div style="display:flex;border-bottom:1px solid #EEF1EF">
+              <div style="width:150px;flex:none;padding:10px 16px;font-size:11.5px;font-weight:600;color:#8A958F;text-transform:uppercase;letter-spacing:.05em;border-right:1px solid #EEF1EF">Mitarbeiter</div>
+              <div style="flex:1;display:flex">
+                <sc-for list="{{ hours }}" as="h" hint-placeholder-count="11">
+                  <div style="flex:1;padding:10px 0 10px 6px;font-size:11px;color:#9AA5A0;font-family:'IBM Plex Mono',monospace;border-left:1px solid #F2F4F3">{{ h }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <!-- rows -->
+            <sc-for list="{{ tourenRows }}" as="row" hint-placeholder-count="4">
+              <div style="display:flex;border-top:1px solid #EEF1EF">
+                <div style="width:150px;flex:none;padding:12px 16px;border-right:1px solid #EEF1EF;display:flex;align-items:center;gap:9px">
+                  <div style="width:28px;height:28px;flex:none;border-radius:999px;background:{{ row.avBg }};color:{{ row.avColor }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">{{ row.ini }}</div>
+                  <div style="min-width:0"><div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div><div style="font-size:11px;color:#9AA5A0">{{ row.gebiet }}</div></div>
+                </div>
+                <div style="flex:1;position:relative;height:70px;background-image:repeating-linear-gradient(to right,transparent,transparent calc(9.0909% - 1px),#F2F4F3 calc(9.0909% - 1px),#F2F4F3 9.0909%)">
+                  <sc-for list="{{ row.blocks }}" as="b" hint-placeholder-count="3">
+                    <div class="pbtn" style="{{ b.style }}">
+                      <div style="font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1E3A2E">{{ b.kunde }}</div>
+                      <div style="font-size:10.5px;color:#4F6A5C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.leistung }}</div>
+                      <div style="font-size:10px;color:#6E8478;font-family:'IBM Plex Mono',monospace;margin-top:1px">{{ b.time }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- map + summary -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;overflow:hidden">
+              <div style="padding:14px 16px 10px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px"><i class="ph ph-map-trifold" style="font-size:16px;color:var(--accent)"></i> Routenübersicht</div>
+              <div style="height:230px;margin:0 12px 12px;border-radius:10px;position:relative;background-color:#EEF2F0;background-image:repeating-linear-gradient(45deg,#E6ECE9 0,#E6ECE9 1px,transparent 1px,transparent 11px);display:flex;align-items:center;justify-content:center;overflow:hidden">
+                <span style="position:absolute;top:38%;left:28%;width:14px;height:14px;border-radius:999px;background:var(--accent);border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)"></span>
+                <span style="position:absolute;top:55%;left:52%;width:14px;height:14px;border-radius:999px;background:var(--accent);border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)"></span>
+                <span style="position:absolute;top:30%;left:68%;width:14px;height:14px;border-radius:999px;background:var(--accent);border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)"></span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A958F;background:rgba(255,255,255,.85);padding:4px 9px;border-radius:6px">[ Kartenintegration ]</span>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E4E8E6;border-radius:13px;padding:16px 18px">
+              <div style="font-size:13.5px;font-weight:600;margin-bottom:12px">Tageszusammenfassung</div>
+              <sc-for list="{{ tourSummary }}" as="s" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid #EEF1EF">
+                  <span style="font-size:13px;color:#4A574F">{{ s.k }}</span><span style="font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace">{{ s.v }}</span>
+                </div>
+              </sc-for>
+              <div style="margin-top:12px;padding:10px 12px;background:#FBF2DC;border-radius:9px;font-size:12px;color:#8A6D1E;display:flex;gap:8px;align-items:center"><i class="ph ph-warning" style="font-size:15px;flex:none"></i> 1 Einsatz um 14:00 noch nicht zugewiesen.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;820px&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#2E7D63&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#2E7D63&quot;,&quot;#357A72&quot;,&quot;#2C6B8C&quot;,&quot;#6C6FB0&quot;,&quot;#A0703A&quot;],&quot;section&quot;:&quot;Erscheinungsbild&quot;},&quot;sidebarTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Hell&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;Hell&quot;,&quot;Dunkel&quot;],&quot;section&quot;:&quot;Erscheinungsbild&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'dashboard', customerId: 1, invoiceId: 0, done: {} };
+
+  go = (screen) => this.setState(screen === 'kunden' ? { screen, customerId: null } : { screen });
+  openCustomer = (id) => this.setState({ screen: 'kunden', customerId: id });
+  backToList = () => this.setState({ customerId: null });
+  selectInvoice = (i) => this.setState({ invoiceId: i });
+  toggleTask = (id) => this.setState(s => ({ done: { ...s.done, [id]: !s.done[id] } }));
+
+  // ---------- static data ----------
+  kundenData = [
+    { id: 1, name: 'Ingrid Bauer', ort: 'München-Sendling', pg: 3, kasse: 'AOK Bayern', ik: '108310400', tel: '089 / 44 21 88', seit: 'März 2024', used: 90, status: 'aktiv' },
+    { id: 2, name: 'Herbert Klein', ort: 'München-Giesing', pg: 2, kasse: 'Techniker KK', ik: '101575519', tel: '089 / 62 30 14', seit: 'Jan 2023', used: 125, status: 'aktiv' },
+    { id: 3, name: 'Waltraud Simon', ort: 'München-Pasing', pg: 4, kasse: 'BARMER', ik: '104940005', tel: '089 / 88 04 52', seit: 'Sep 2022', used: 45, status: 'aktiv' },
+    { id: 4, name: 'Josef Wagner', ort: 'Freising', pg: 2, kasse: 'DAK-Gesundheit', ik: '101570104', tel: '08161 / 55 10', seit: 'Nov 2024', used: 110, status: 'pausiert' },
+    { id: 5, name: 'Erika Hoffmann', ort: 'München-Schwabing', pg: 3, kasse: 'AOK Bayern', ik: '108310400', tel: '089 / 33 76 90', seit: 'Feb 2025', used: 30, status: 'aktiv' },
+    { id: 6, name: 'Karl-Heinz Vogt', ort: 'Dachau', pg: 1, kasse: 'IKK classic', ik: '107202793', tel: '08131 / 27 44', seit: 'Jun 2024', used: 62, status: 'aktiv' },
+    { id: 7, name: 'Anneliese Richter', ort: 'München-Haidhausen', pg: 5, kasse: 'KKH', ik: '102171012', tel: '089 / 48 12 07', seit: 'Aug 2021', used: 125, status: 'aktiv' },
+    { id: 8, name: 'Dieter Schulz', ort: 'Germering', pg: 2, kasse: 'Techniker KK', ik: '101575519', tel: '089 / 84 39 61', seit: 'Juli 2026', used: 0, status: 'neu' },
+  ];
+  kassenData = [
+    { name: 'AOK Bayern', typ: 'Gesetzliche Pflegekasse', ik: '108310400', ap: 'Frau Merten', tel: '0800 / 265 080', weg: 'DTA §302', kunden: 2 },
+    { name: 'Techniker Krankenkasse', typ: 'Gesetzliche Pflegekasse', ik: '101575519', ap: 'Herr Alsen', tel: '0800 / 285 850', weg: 'DTA §302', kunden: 2 },
+    { name: 'BARMER', typ: 'Gesetzliche Pflegekasse', ik: '104940005', ap: 'Frau Kühne', tel: '0800 / 333 004', weg: 'Papier / Post', kunden: 1 },
+    { name: 'DAK-Gesundheit', typ: 'Gesetzliche Pflegekasse', ik: '101570104', ap: 'Frau Roth', tel: '0800 / 325 032', weg: 'DTA §302', kunden: 1 },
+    { name: 'IKK classic', typ: 'Gesetzliche Pflegekasse', ik: '107202793', ap: 'Herr Petzold', tel: '0800 / 455 545', weg: 'Papier / Post', kunden: 1 },
+    { name: 'KKH', typ: 'Gesetzliche Pflegekasse', ik: '102171012', ap: 'Frau Blum', tel: '0800 / 554 545', weg: 'DTA §302', kunden: 1 },
+  ];
+  leistungenData = [
+    { name: 'Haushaltshilfe', kat: 'Haushaltsnahe DL', abr: 'Kasse §45b', preis: '32,00 €', einheit: 'pro Stunde', icon: 'ph ph-broom' },
+    { name: 'Einkaufs- & Besorgungshilfe', kat: 'Haushaltsnahe DL', abr: 'Kasse §45b', preis: '32,00 €', einheit: 'pro Stunde', icon: 'ph ph-shopping-cart-simple' },
+    { name: 'Wäscheservice', kat: 'Haushaltsnahe DL', abr: 'Selbstzahler', preis: '28,00 €', einheit: 'pro Stunde', icon: 'ph ph-t-shirt' },
+    { name: 'Grundreinigung', kat: 'Haushaltsnahe DL', abr: 'Selbstzahler', preis: '30,00 €', einheit: 'pro Stunde', icon: 'ph ph-spray-bottle' },
+    { name: 'Begleitung bei Terminen', kat: 'Betreuung im Alltag', abr: 'Kasse §45b', preis: '34,00 €', einheit: 'pro Stunde', icon: 'ph ph-person-simple-walk' },
+    { name: 'Betreuung im Alltag', kat: 'Betreuung im Alltag', abr: 'Kasse §45b', preis: '36,00 €', einheit: 'pro Stunde', icon: 'ph ph-hand-heart' },
+    { name: 'Demenzbetreuung', kat: 'Betreuung im Alltag', abr: 'Kasse §45b', preis: '38,00 €', einheit: 'pro Stunde', icon: 'ph ph-brain' },
+    { name: 'Fahrtpauschale', kat: 'Sonstiges', abr: 'Selbstzahler', preis: '8,50 €', einheit: 'pro Einsatz', icon: 'ph ph-car' },
+  ];
+  rechnungenData = [
+    { nr: 'R-2026-0142', kunde: 'Ingrid Bauer', datum: '05.07.2026', betrag: '288,00 €', status: 'Offen', tone: 'warn', kind: 'r' },
+    { nr: 'R-2026-0141', kunde: 'Herbert Klein', datum: '04.07.2026', betrag: '375,00 €', status: 'Bezahlt', tone: 'success', kind: 'r' },
+    { nr: 'A-2026-0056', kunde: 'Erika Hoffmann', datum: '03.07.2026', betrag: '512,00 €', status: 'Versendet', tone: 'info', kind: 'a' },
+    { nr: 'R-2026-0140', kunde: 'Waltraud Simon', datum: '01.07.2026', betrag: '204,00 €', status: 'Überfällig', tone: 'danger', kind: 'r' },
+    { nr: 'R-2026-0139', kunde: 'Josef Wagner', datum: '30.06.2026', betrag: '330,00 €', status: 'Bezahlt', tone: 'success', kind: 'r' },
+    { nr: 'E-2026-0009', kunde: 'Dieter Schulz', datum: '08.07.2026', betrag: '96,00 €', status: 'Entwurf', tone: 'gray', kind: 'e' },
+  ];
+  mitarbeiterData = [
+    { name: 'Sabine Wolf', gebiet: 'München Süd', quali: ['Betreuungskraft §43b', 'Erste Hilfe'], tage: 'Mo–Fr', tel: '0170 / 22 14 05', auslastung: 82 },
+    { name: 'Thomas Berg', gebiet: 'München Ost', quali: ['Pflegehelfer', 'Führerschein B'], tage: 'Mo–Sa', tel: '0171 / 88 03 76', auslastung: 74 },
+    { name: 'Yasemin Demir', gebiet: 'München Zentrum', quali: ['Betreuungskraft §43b', 'Demenz'], tage: 'Di–Sa', tel: '0152 / 40 91 33', auslastung: 90 },
+    { name: 'Markus Lang', gebiet: 'Freising / Dachau', quali: ['Hauswirtschaft', 'Führerschein B'], tage: 'Mo–Fr', tel: '0160 / 55 71 20', auslastung: 65 },
+    { name: 'Petra Frank', gebiet: 'München West', quali: ['Betreuungskraft §43b'], tage: 'Mo–Do', tel: '0176 / 31 08 44', auslastung: 58 },
+    { name: 'Ahmet Yildiz', gebiet: 'München Nord', quali: ['Pflegehelfer', 'Erste Hilfe'], tage: 'Mi–So', tel: '0157 / 92 66 18', auslastung: 71 },
+  ];
+  toursData = [
+    { name: 'Sabine Wolf', ini: 'SW', gebiet: 'München Süd', blocks: [
+      { start: 8, dur: 1.5, kunde: 'Ingrid Bauer', leistung: 'Haushaltshilfe' },
+      { start: 10, dur: 2, kunde: 'Erika Hoffmann', leistung: 'Betreuung im Alltag' },
+      { start: 13, dur: 2, kunde: 'Anneliese Richter', leistung: 'Demenzbetreuung' },
+    ]},
+    { name: 'Thomas Berg', ini: 'TB', gebiet: 'München Ost', blocks: [
+      { start: 8.5, dur: 1, kunde: 'Josef Wagner', leistung: 'Einkaufshilfe' },
+      { start: 11, dur: 1.5, kunde: 'Karl-H. Vogt', leistung: 'Begleitung' },
+      { start: 14, dur: 2, kunde: 'Dieter Schulz', leistung: 'Haushaltshilfe' },
+    ]},
+    { name: 'Yasemin Demir', ini: 'YD', gebiet: 'München Zentrum', blocks: [
+      { start: 9, dur: 2, kunde: 'Waltraud Simon', leistung: 'Betreuung im Alltag' },
+      { start: 12, dur: 1, kunde: 'Herbert Klein', leistung: 'Begleitung' },
+      { start: 14.5, dur: 1.5, kunde: 'Anneliese Richter', leistung: 'Betreuung' },
+    ]},
+    { name: 'Markus Lang', ini: 'ML', gebiet: 'Freising', blocks: [
+      { start: 8, dur: 3, kunde: 'Waltraud Simon', leistung: 'Grundreinigung' },
+      { start: 13, dur: 1.5, kunde: 'Dieter Schulz', leistung: 'Wäscheservice' },
+    ]},
+  ];
+
+  avatarPalette = [
+    ['#EAF3EF', '#2E7D63'], ['#EEF1F5', '#2C6B8C'], ['#F3EEF5', '#7A4B8C'],
+    ['#FBF2E4', '#A9721A'], ['#F5EEEE', '#A0524A'], ['#EAF1F0', '#357A72'],
+  ];
+  av(i) { return this.avatarPalette[i % this.avatarPalette.length]; }
+
+  badge(tone) {
+    const map = {
+      gray: ['#F0F2F1', '#63706A'], info: ['#E9F1F5', '#2C6B8C'], warn: ['#FBF2DC', '#8A6D1E'],
+      danger: ['#FBECEA', '#B24A3F'], success: ['var(--accent-soft)', 'var(--accent)'], neu: ['#E9F1F5', '#2C6B8C'],
+    };
+    const [bg, c] = map[tone] || map.gray;
+    return `display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;background:${bg};color:${c}`;
+  }
+  statusTone(s) { return s === 'aktiv' ? 'success' : s === 'neu' ? 'neu' : 'gray'; }
+  statusLabel(s) { return s === 'aktiv' ? 'Aktiv' : s === 'neu' ? 'Neu' : 'Pausiert'; }
+  budgetColor(used) { return used >= 118 ? '#B24A3F' : used >= 95 ? '#B5820E' : 'var(--accent)'; }
+  eur(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+  renderVals() {
+    const p = this.props || {};
+    const accent = p.accent || '#2E7D63';
+    const dark = p.sidebarTheme === 'Dunkel';
+    const scr = this.state.screen;
+
+    const navDef = [
+      { key: 'dashboard', label: 'Dashboard', icon: 'ph ph-squares-four' },
+      { key: 'kunden', label: 'Kunden', icon: 'ph ph-users', badge: '8' },
+      { key: 'kassen', label: 'Kostenträger', icon: 'ph ph-buildings' },
+      { key: 'katalog', label: 'Leistungskatalog', icon: 'ph ph-list-checks' },
+      { key: 'rechnungen', label: 'Angebote & Rechnungen', icon: 'ph ph-receipt', badge: '3' },
+      { key: 'mitarbeiter', label: 'Mitarbeiter', icon: 'ph ph-identification-badge' },
+      { key: 'touren', label: 'Tourenplanung', icon: 'ph ph-path' },
+    ];
+    const sb = dark
+      ? { bg: '#1E2E27', border: 'rgba(255,255,255,.08)', brand: '#fff', muted: '#8DA096', text: '#B7C4BD', activeBg: 'rgba(255,255,255,.09)', activeText: '#fff', hover: 'rgba(255,255,255,.05)' }
+      : { bg: '#FBFCFB', border: '#E9ECEA', brand: '#17211C', muted: '#8A958F', text: '#4A574F', activeBg: 'var(--accent-soft)', activeText: 'var(--accent)', hover: '#F2F5F3' };
+
+    const nav = navDef.map(n => {
+      const active = scr === n.key;
+      return {
+        label: n.label, icon: n.icon, badge: n.badge,
+        onClick: () => this.go(n.key),
+        style: `display:flex;align-items:center;gap:11px;padding:9px 11px;margin-bottom:2px;border-left:3px solid ${active ? 'var(--accent)' : 'transparent'};border-radius:0 9px 9px 0;cursor:pointer;font-size:13.5px;font-weight:${active ? 600 : 500};color:${active ? sb.activeText : sb.text};background:${active ? sb.activeBg : 'transparent'};text-decoration:none;--nav-hover:${active ? sb.activeBg : sb.hover}`,
+      };
+    });
+
+    const titles = {
+      dashboard: ['Dashboard', 'Überblick über Ihren Betrieb · Donnerstag, 9. Juli 2026'],
+      kunden: ['Kunden', 'Stammdaten, Pflegegrade und Entlastungsbudgets verwalten'],
+      kassen: ['Kranken- & Pflegekassen', 'Kostenträger und Abrechnungswege'],
+      katalog: ['Leistungskatalog', 'Angebotene Leistungen und Preise'],
+      rechnungen: ['Angebote & Rechnungen', 'Dokumente erstellen und abrechnen'],
+      mitarbeiter: ['Mitarbeiter', 'Qualifikationen, Verfügbarkeiten und Einsatzgebiete'],
+      touren: ['Tourenplanung', 'Einsätze planen und Mitarbeitern zuweisen'],
+    };
+    const inDetail = scr === 'kunden' && this.state.customerId != null;
+    const [pageTitle, pageSub] = inDetail ? ['Kundendetails', titles.kunden[1]] : titles[scr];
+
+    // KPIs
+    const kpis = [
+      { label: 'Offene Rechnungen', value: '7', sub: '3.480 € ausstehend', icon: 'ph ph-receipt', tone: 'warn', trend: '2 überfällig', up: false },
+      { label: 'Touren heute', value: '13', sub: '4 Mitarbeiter im Einsatz', icon: 'ph ph-path', tone: 'accent', trend: '+2', up: true },
+      { label: 'Neue Anfragen', value: '3', sub: 'seit gestern', icon: 'ph ph-tray-arrow-down', tone: 'info', trend: 'heute', up: true },
+      { label: 'Ø Budget genutzt', value: '68 %', sub: 'des Entlastungsbetrags', icon: 'ph ph-chart-donut', tone: 'neutral', trend: '+5 %', up: true },
+    ].map(k => {
+      const tones = { warn: ['#FBF2DC', '#8A6D1E'], accent: ['var(--accent-soft)', 'var(--accent)'], info: ['#E9F1F5', '#2C6B8C'], neutral: ['#F0F2F1', '#63706A'] };
+      const [bg, c] = tones[k.tone];
+      const tc = k.up ? '#2E7D63' : '#B5820E';
+      return { ...k, iconStyle: `background:${bg};color:${c}`,
+        trendStyle: `display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:600;color:${tc}`,
+        trendIcon: k.up ? 'ph ph-trend-up' : 'ph ph-warning-circle' };
+    });
+
+    // Week
+    const weekRaw = [{ day: 'Mo', n: 11 }, { day: 'Di', n: 14 }, { day: 'Mi', n: 9 }, { day: 'Do', n: 13 }, { day: 'Fr', n: 12 }, { day: 'Sa', n: 6 }, { day: 'So', n: 2 }];
+    const wmax = Math.max(...weekRaw.map(d => d.n));
+    const week = weekRaw.map(d => ({ ...d, h: Math.round(d.n / wmax * 100) + '%', bar: d.day === 'Do' ? 'var(--accent)' : 'var(--accent-line)' }));
+    week[3].bar = 'var(--accent)';
+    weekRaw.forEach((d, i) => { week[i].bar = d.day === 'Do' ? 'var(--accent)' : '#B9D4C8'; });
+
+    // Upcoming tours
+    const upcoming = [
+      { time: '08:00', ini: 'SW', kunde: 'Ingrid Bauer', leistung: 'Haushaltshilfe', mitarbeiter: 'S. Wolf', dur: '1,5 h' },
+      { time: '08:30', ini: 'TB', kunde: 'Josef Wagner', leistung: 'Einkaufshilfe', mitarbeiter: 'T. Berg', dur: '1 h' },
+      { time: '09:00', ini: 'YD', kunde: 'Waltraud Simon', leistung: 'Betreuung im Alltag', mitarbeiter: 'Y. Demir', dur: '2 h' },
+      { time: '10:00', ini: 'SW', kunde: 'Erika Hoffmann', leistung: 'Betreuung im Alltag', mitarbeiter: 'S. Wolf', dur: '2 h' },
+    ].map(t => ({ ...t, badge: this.badge('gray') }));
+
+    // Tasks
+    const taskDef = [
+      { id: 't1', text: 'Abrechnung AOK Bayern für Juni einreichen', meta: 'Fällig heute', prio: '#B24A3F' },
+      { id: 't2', text: 'Erstgespräch mit Fam. Schulz terminieren', meta: 'Morgen · neue Anfrage', prio: '#B5820E' },
+      { id: 't3', text: 'Budget-Info an Frau Richter senden', meta: 'Budget aufgebraucht', prio: '#B5820E' },
+      { id: 't4', text: 'Dienstplan KW 29 finalisieren', meta: 'Bis Freitag', prio: '#B9D4C8' },
+      { id: 't5', text: 'Qualifikationsnachweis M. Lang ablegen', meta: 'Erledigt', prio: '#B9D4C8' },
+    ];
+    const tasks = taskDef.map(t => {
+      const done = !!this.state.done[t.id];
+      return { text: t.text, meta: t.meta, prio: t.prio, toggle: () => this.toggleTask(t.id),
+        check: done ? 'ph-fill ph-check-circle' : 'ph ph-circle',
+        checkStyle: `color:${done ? 'var(--accent)' : '#C7CFCB'}`,
+        textStyle: done ? 'text-decoration:line-through;color:#9AA5A0' : 'color:#2A352F' };
+    });
+    const openTaskCount = taskDef.length - Object.values(this.state.done).filter(Boolean).length;
+
+    const anfragen = [
+      { name: 'Familie Schulz', info: 'Germering · Haushaltshilfe' },
+      { name: 'Herr Neumann', info: 'München-Laim · Betreuung, PG 2' },
+      { name: 'Frau Özdemir', info: 'Dachau · Begleitung' },
+    ];
+
+    // Kunden list
+    const kunden = this.kundenData.map((k, i) => {
+      const [avBg, avColor] = this.av(i);
+      const pct = Math.round(k.used / 125 * 100);
+      return { name: k.name, ort: k.ort, ini: k.name.split(' ').map(w => w[0]).join(''), avBg, avColor,
+        pg: 'Grad ' + k.pg, kasse: k.kasse,
+        budgetPct: pct + '%', budgetColor: this.budgetColor(k.used), budgetLabel: this.eur(k.used) + ' / 125',
+        statusBadge: this.badge(this.statusTone(k.status)), statusLabel: this.statusLabel(k.status),
+        open: () => this.openCustomer(k.id) };
+    });
+
+    // Kunde detail
+    let cust = null;
+    const cd = this.kundenData.find(k => k.id === this.state.customerId);
+    if (cd) {
+      const idx = this.kundenData.indexOf(cd);
+      const [avBg, avColor] = this.av(idx);
+      cust = {
+        name: cd.name, ini: cd.name.split(' ').map(w => w[0]).join(''), avBg, avColor,
+        statusBadge: this.badge(this.statusTone(cd.status)), statusLabel: this.statusLabel(cd.status),
+        ort: cd.ort, tel: cd.tel, seit: cd.seit, kasse: cd.kasse, ik: cd.ik,
+        budgetUsed: this.eur(cd.used), budgetRest: this.eur(125 - cd.used),
+        budgetPct: Math.round(cd.used / 125 * 100) + '%', budgetColor: this.budgetColor(cd.used),
+        stamm: [
+          { k: 'Geburtsdatum', v: '14.03.1948' }, { k: 'Pflegegrad', v: 'Grad ' + cd.pg },
+          { k: 'Adresse', v: cd.ort }, { k: 'Telefon', v: cd.tel }, { k: 'Kunde seit', v: cd.seit },
+        ],
+        kontakte: [
+          { name: 'Michael Bauer', rolle: 'Sohn · Bevollmächtigter', tel: '0171 / 44 90 12' },
+          { name: 'Dr. Sabine Roth', rolle: 'Hausärztin', tel: '089 / 55 21 07' },
+        ],
+        historie: [
+          { datum: '05.07.2026', leistung: 'Haushaltshilfe', ma: 'S. Wolf', betrag: '48,00 €' },
+          { datum: '03.07.2026', leistung: 'Begleitung Arzttermin', ma: 'S. Wolf', betrag: '51,00 €' },
+          { datum: '28.06.2026', leistung: 'Betreuung im Alltag', ma: 'Y. Demir', betrag: '72,00 €' },
+          { datum: '25.06.2026', leistung: 'Haushaltshilfe', ma: 'S. Wolf', betrag: '64,00 €' },
+          { datum: '20.06.2026', leistung: 'Wäscheservice', ma: 'M. Lang', betrag: '28,00 €' },
+        ],
+        docs: [
+          { name: 'Pflegegrad-Bescheid.pdf', meta: 'PDF · 240 KB · März 2024', icon: 'ph ph-file-pdf', iconBg: '#FBECEA', iconColor: '#B24A3F' },
+          { name: 'Abtretungserklärung §45b.pdf', meta: 'PDF · 180 KB · März 2024', icon: 'ph ph-file-pdf', iconBg: '#FBECEA', iconColor: '#B24A3F' },
+          { name: 'Betreuungsvertrag.docx', meta: 'DOCX · 96 KB · März 2024', icon: 'ph ph-file-doc', iconBg: '#E9F1F5', iconColor: '#2C6B8C' },
+        ],
+      };
+    }
+
+    const kassen = this.kassenData.map(k => ({ ...k, wegBadge: this.badge(k.weg.startsWith('DTA') ? 'success' : 'gray') }));
+
+    const leistungen = this.leistungenData.map(l => ({ ...l,
+      katBadge: this.badge('gray'),
+      abrBadge: this.badge(l.abr.startsWith('Kasse') ? 'info' : 'warn') }));
+
+    const rechnungen = this.rechnungenData.map((r, i) => {
+      const kindIcon = { r: ['ph ph-receipt', 'var(--accent-soft)', 'var(--accent)'], a: ['ph ph-file-text', '#E9F1F5', '#2C6B8C'], e: ['ph ph-note-pencil', '#F0F2F1', '#63706A'] }[r.kind];
+      const active = i === this.state.invoiceId;
+      return { nr: r.nr, kunde: r.kunde, datum: r.datum, betrag: r.betrag, status: r.status,
+        badge: this.badge(r.tone), icon: kindIcon[0], iconBg: kindIcon[1], iconColor: kindIcon[2],
+        activeStyle: active ? 'background:#F7F9F8;box-shadow:inset 3px 0 0 var(--accent)' : '',
+        select: () => this.selectInvoice(i) };
+    });
+
+    const mitarbeiter = this.mitarbeiterData.map((m, i) => {
+      const [avBg, avColor] = this.av(i);
+      return { ...m, ini: m.name.split(' ').map(w => w[0]).join(''), avBg, avColor,
+        auslastung: m.auslastung + '%',
+        aColor: m.auslastung >= 88 ? '#B5820E' : 'var(--accent)' };
+    });
+
+    // Tours timeline
+    const base = 7, span = 11;
+    const hours = [];
+    for (let h = 7; h <= 17; h++) hours.push(String(h).padStart(2, '0'));
+    const tourenRows = this.toursData.map((r, i) => {
+      const [avBg, avColor] = this.av(i);
+      const blocks = r.blocks.map(b => {
+        const left = (b.start - base) / span * 100;
+        const width = b.dur / span * 100 - 0.6;
+        const hh = Math.floor(b.start), mm = Math.round((b.start % 1) * 60);
+        const eh = b.start + b.dur, ehh = Math.floor(eh), emm = Math.round((eh % 1) * 60);
+        const fmt = (a, m) => String(a).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+        return { kunde: b.kunde, leistung: b.leistung, time: fmt(hh, mm) + '–' + fmt(ehh, emm),
+          style: `position:absolute;left:${left}%;width:${width}%;top:7px;bottom:7px;box-sizing:border-box;background:var(--accent-soft);border:1px solid var(--accent-line);border-left:3px solid var(--accent);border-radius:7px;padding:5px 8px;overflow:hidden` };
+      });
+      return { name: r.name, ini: r.ini, gebiet: r.gebiet, avBg, avColor, blocks };
+    });
+    const tourSummary = [
+      { k: 'Geplante Einsätze', v: '13' }, { k: 'Gesamtstunden', v: '19,5 h' },
+      { k: 'Gefahrene Kilometer (ca.)', v: '96 km' }, { k: 'Nicht zugewiesen', v: '1' },
+    ];
+
+    return {
+      accent, accentSoft: accent + '14', accentLine: accent + '30', sb,
+      nav, pageTitle, pageSub,
+      isDashboard: scr === 'dashboard',
+      isKundenListe: scr === 'kunden' && this.state.customerId == null,
+      isKundeDetail: inDetail,
+      isKassen: scr === 'kassen', isKatalog: scr === 'katalog',
+      isRechnungen: scr === 'rechnungen', isMitarbeiter: scr === 'mitarbeiter', isTouren: scr === 'touren',
+      kpis, week, upcoming, tasks, openTaskCount, anfragen,
+      goTouren: () => this.go('touren'),
+      kunden, cust, backToList: () => this.backToList(),
+      kassen, leistungen, rechnungen, mitarbeiter,
+      hours, tourenRows, tourSummary,
+    };
+  }
+}
+</script>
+</body>
+</html>
